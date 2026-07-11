@@ -59,3 +59,24 @@ body {
   font-family: var(--font-sans);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+@utility status-chip {
+  @apply rounded-full px-3 py-1 text-[12px] font-medium uppercase tracking-wider inline-flex items-center justify-center;
+}
+
+@utility chip-pending {
+  @apply status-chip bg-accent/15 text-accent;
+}
+
+@utility chip-approved {
+  @apply status-chip bg-success/15 text-success;
+}
+
+@utility chip-rejected {
+  @apply status-chip bg-danger/15 text-danger;
+}
+
+@utility chip-funded {
+  @apply status-chip bg-primary/15 text-primary;
+}
+
