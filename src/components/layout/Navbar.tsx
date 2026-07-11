@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Coins, LogOut, Github, ChevronDown, User, LayoutDashboard } from "lucide-react";
+import { Menu, X, Coins, LogOut, ChevronDown, User, LayoutDashboard } from "lucide-react";
 import { useMockAuth } from "@/lib/mock-auth";
+import { GithubIcon } from "@/components/ui/Icons";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -57,7 +58,7 @@ export default function Navbar() {
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-[13px] font-medium text-neutral-400 hover:text-white transition-colors"
           >
-            <Github size={16} />
+            <GithubIcon size={16} />
             <span>Join as Developer</span>
           </a>
 
@@ -232,7 +233,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-base font-medium text-neutral-400 hover:bg-neutral-800 hover:text-white"
             >
-              <Github size={18} />
+              <GithubIcon size={18} />
               <span>Join as Developer</span>
             </a>
 
