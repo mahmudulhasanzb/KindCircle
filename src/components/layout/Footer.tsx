@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Github, Facebook, Linkedin } from "lucide-react";
+import { GithubIcon, FacebookIcon, LinkedinIcon } from "@/components/ui/Icons";
 
 export default function Footer() {
   return (
@@ -48,7 +48,7 @@ export default function Footer() {
               className="rounded-full bg-neutral-900 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-all"
               aria-label="GitHub"
             >
-              <Github size={18} />
+              <GithubIcon size={18} />
             </a>
             <a
               href="https://linkedin.com"
@@ -57,7 +57,7 @@ export default function Footer() {
               className="rounded-full bg-neutral-900 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-all"
               aria-label="LinkedIn"
             >
-              <Linkedin size={18} />
+              <LinkedinIcon size={18} />
             </a>
             <a
               href="https://facebook.com"
@@ -66,7 +66,7 @@ export default function Footer() {
               className="rounded-full bg-neutral-900 p-2 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-all"
               aria-label="Facebook"
             >
-              <Facebook size={18} />
+              <FacebookIcon size={18} />
             </a>
           </div>
         </div>
