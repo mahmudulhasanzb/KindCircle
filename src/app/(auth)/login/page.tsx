@@ -1,39 +1,40 @@
 'use client';
+
 import { authClient } from '@/lib/auth-client';
-import { Check, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm();
 
-  // Watch password for real-time validation rules
-  const passwordVal = watch('password', '');
-  const hasMinLength = passwordVal.length >= 6;
-  const hasUppercase = /[A-Z]/.test(passwordVal);
-  const hasLowercase = /[a-z]/.test(passwordVal);
-
   const onSubmit = async (data: any) => {
-    const { name, email, password } = data;
-    console.log(data)
+    const { email, password } = data;
+    console.log({ data });
 
-
-    const { data: authData, error } = await authClient.signUp.email({
-      name,
+    const { data: authData, error } = await authClient.signIn.email({
       email,
       password,
     });
-    console.log({authData, error})
+    console.log({ authData, error });
+
+    if (error) {
+      toast.error(error.message || 'Sign in failed');
+      return;
+    }
+
+    toast.success('Signed in successfully!');
+    router.push('/');
   };
 
   return (
@@ -42,80 +43,15 @@ const RegisterPage = () => {
         {/* Header */}
         <div className="mb-8 text-center flex flex-col items-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            Create Account
+            Welcome Back
           </h2>
           <p className="text-neutral-400 text-sm mt-1.5 font-medium">
-            Join KindCircle to support or launch campaigns.
+            Sign in to your account.
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Biometric Upload */}
-          {/* <div className="flex flex-col items-center justify-center space-y-2 mb-4">
-            <div className="relative w-24 h-24">
-              <div
-                onClick={handlePhotoClick}
-                className="w-full h-full rounded-full border border-dashed border-[#282F18] hover:border-[#D4FF00]/50 bg-[#14180A] flex items-center justify-center cursor-pointer group transition-all duration-300 overflow-hidden"
-              >
-                {photoPreview ? (
-                  <Image
-                    src={photoPreview}
-                    alt="Profile Preview"
-                    width={96}
-                    height={96}
-                    unoptimized={true}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-[#A4A896]/40 group-hover:text-white transition-colors duration-200">
-                    <Camera className="w-7 h-7 stroke-[1.5]" />
-                  </div>
-                )}
-              </div>
-
-              <div
-                onClick={handlePhotoClick}
-                className="absolute bottom-0 right-0 bg-[#D4FF00] rounded-full p-1.5 border-2 border-[#0E1106] flex items-center justify-center shadow-lg cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95 z-10"
-              >
-                <Plus className="w-3 h-3 text-[#121212] stroke-[3]" />
-              </div>
-            </div>
-            <span className="text-[10px] text-[#A4A896]/55 tracking-wider font-extrabold uppercase mt-1">
-              Upload Biometric Photo
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              {...register('image', {
-                onChange: handleFileChange,
-              })}
-              ref={e => {
-                register('image').ref(e);
-                fileInputRef.current = e;
-              }}
-            />
-          </div> */}
-
-          {/* Full Name */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Full Name
-            </label>
-            <input
-              type="text"
-              {...register('name', { required: 'Name is required' })}
-              placeholder="Jane Doe"
-              className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
-            />
-            {errors.name && (
-              <span className="text-danger text-xs">
-                {errors.name.message as string}
-              </span>
-            )}
-          </div>
-
-          {/* Email Address */}
+          {/* Email */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
               Email Address
@@ -123,7 +59,7 @@ const RegisterPage = () => {
             <input
               type="email"
               {...register('email', { required: 'Email is required' })}
-              placeholder="supporter@kindcircle.com"
+              placeholder="you@example.com"
               className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             />
             {errors.email && (
@@ -133,7 +69,7 @@ const RegisterPage = () => {
             )}
           </div>
 
-          {/* Password Field */}
+          {/* Password */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
               Password
@@ -148,7 +84,7 @@ const RegisterPage = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 cursor-pointer transition-colors duration-150"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -164,47 +100,7 @@ const RegisterPage = () => {
             )}
           </div>
 
-          {/* Password Validation Hints */}
-          <div className="space-y-1.5 pt-1">
-            <div className="flex items-center space-x-2 text-xs">
-              <span
-                className={`rounded-full p-0.5 ${hasMinLength ? 'bg-success/20 text-success' : 'bg-neutral-900 text-neutral-500'}`}
-              >
-                <Check className="w-3 h-3 stroke-[3]" />
-              </span>
-              <span
-                className={hasMinLength ? 'text-neutral-200' : 'text-neutral-500'}
-              >
-                6+ characters
-              </span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs">
-              <span
-                className={`rounded-full p-0.5 ${hasUppercase ? 'bg-success/20 text-success' : 'bg-neutral-900 text-neutral-500'}`}
-              >
-                <Check className="w-3 h-3 stroke-[3]" />
-              </span>
-              <span
-                className={hasUppercase ? 'text-neutral-200' : 'text-neutral-500'}
-              >
-                1 uppercase letter
-              </span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs">
-              <span
-                className={`rounded-full p-0.5 ${hasLowercase ? 'bg-success/20 text-success' : 'bg-neutral-900 text-neutral-500'}`}
-              >
-                <Check className="w-3 h-3 stroke-[3]" />
-              </span>
-              <span
-                className={hasLowercase ? 'text-neutral-200' : 'text-neutral-500'}
-              >
-                1 lowercase letter
-              </span>
-            </div>
-          </div>
-
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting}
@@ -231,30 +127,28 @@ const RegisterPage = () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                <span>Creating Account...</span>
+                <span>Signing In...</span>
               </>
             ) : (
-              <span>Create Account</span>
+              <span>Sign In</span>
             )}
           </button>
 
           {/* Divider */}
           <div className="relative py-2 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-700/60"></div>
+              <div className="w-full border-t border-neutral-700/60" />
             </div>
             <span className="relative bg-neutral-800 px-4 text-[9px] font-extrabold text-neutral-500 uppercase tracking-widest select-none">
               Or Continue With
             </span>
           </div>
 
-          {/* Google Signup Button */}
+          {/* Google */}
           <button
-            // onClick={handleGoogleSignIn}
             type="button"
             className="w-full bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-white font-bold text-xs uppercase py-3.5 rounded-lg cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200"
           >
-            {/* Custom Google Icon SVG */}
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.187 4.114-3.478 0-6.3-2.822-6.3-6.3s2.822-6.3 6.3-6.3c1.63 0 3.106.625 4.22 1.642l3.085-3.085C19.04 2.5 15.9 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.897 0 10.866-4.188 10.866-11.24 0-.768-.078-1.516-.216-2.24H12.24z" />
             </svg>
@@ -262,14 +156,14 @@ const RegisterPage = () => {
           </button>
         </form>
 
-        {/* Footer Link */}
+        {/* Footer */}
         <div className="mt-8 text-center text-xs font-semibold text-neutral-400">
-          Already have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link
-            href="/login"
+            href="/register"
             className="text-primary hover:underline transition-colors duration-200"
           >
-            Sign In
+            Sign Up
           </Link>
         </div>
       </div>
@@ -277,5 +171,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
-
+export default LoginPage;
