@@ -20,13 +20,11 @@ const LoginPage = () => {
 
   const onSubmit = async (data: any) => {
     const { email, password } = data;
-    console.log({ data });
 
     const { data: authData, error } = await authClient.signIn.email({
       email,
       password,
     });
-    console.log({ authData, error });
 
     if (error) {
       toast.error(error.message || 'Sign in failed');
@@ -44,8 +42,7 @@ const LoginPage = () => {
         callbackURL: '/',
       });
     } catch (error) {
-      console.error(error);
-      toast.error('Google sign in failed');
+      toast.error((error as Error).message || 'Google sign in failed');
     }
   };
 

@@ -1,15 +1,19 @@
 'use client';
 import { authClient } from '@/lib/auth-client';
+import { uploadImage } from '@/lib/uploadImage';
 import {
+  Camera,
   Check,
   Eye,
   EyeOff,
   HeartHandshake,
+  Plus,
   Rocket,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -17,6 +21,8 @@ const RegisterPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('supporter');
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -31,15 +37,44 @@ const RegisterPage = () => {
   const hasUppercase = /[A-Z]/.test(passwordVal);
   const hasLowercase = /[a-z]/.test(passwordVal);
 
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const toastId = toast.loading('Uploading profile photo...');
+      try {
+        const imageUrl = await uploadImage(file);
+        if (imageUrl) {
+          setPhotoPreview(imageUrl);
+          toast.success('Profile photo uploaded successfully!', {
+            id: toastId,
+          });
+        } else {
+          toast.error('Failed to upload photo.', { id: toastId });
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to upload photo.', { id: toastId });
+      }
+    }
+  };
+
+
+
   const onSubmit = async (data: any) => {
     const { name, email, password } = data;
-    console.log(data);
-
+ 
     const { data: authData, error } = await authClient.signUp.email({
-      ...data,
+      name,
+      email,
+      password,
       role: role,
       credits: role === 'supporter' ? 50 : 20,
-    });
+      image: photoPreview || undefined,
+    } as any);
     console.log(authData);
     console.log(error);
 
@@ -76,13 +111,15 @@ const RegisterPage = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} 
+          className="space-y-6">
+
           {/* Biometric Upload */}
-          {/* <div className="flex flex-col items-center justify-center space-y-2 mb-4">
+          <div className="flex flex-col items-center justify-center space-y-2 mb-4">
             <div className="relative w-24 h-24">
               <div
                 onClick={handlePhotoClick}
-                className="w-full h-full rounded-full border border-dashed border-[#282F18] hover:border-[#D4FF00]/50 bg-[#14180A] flex items-center justify-center cursor-pointer group transition-all duration-300 overflow-hidden"
+                className="w-full h-full rounded-full border border-dashed border-neutral-700 hover:border-primary/50 bg-neutral-900 flex items-center justify-center cursor-pointer group transition-all duration-300 overflow-hidden"
               >
                 {photoPreview ? (
                   <Image
@@ -94,21 +131,21 @@ const RegisterPage = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-[#A4A896]/40 group-hover:text-white transition-colors duration-200">
+                  <div className="flex flex-col items-center justify-center text-neutral-500 group-hover:text-white transition-colors duration-200">
                     <Camera className="w-7 h-7 stroke-[1.5]" />
                   </div>
                 )}
               </div>
-
+ 
               <div
                 onClick={handlePhotoClick}
-                className="absolute bottom-0 right-0 bg-[#D4FF00] rounded-full p-1.5 border-2 border-[#0E1106] flex items-center justify-center shadow-lg cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95 z-10"
+                className="absolute bottom-0 right-0 bg-primary rounded-full p-1.5 border-2 border-neutral-800 flex items-center justify-center shadow-lg cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95 z-10"
               >
-                <Plus className="w-3 h-3 text-[#121212] stroke-[3]" />
+                <Plus className="w-3 h-3 text-white stroke-[3]" />
               </div>
             </div>
-            <span className="text-[10px] text-[#A4A896]/55 tracking-wider font-extrabold uppercase mt-1">
-              Upload Biometric Photo
+            <span className="text-[10px] text-neutral-400 tracking-wider font-extrabold uppercase mt-1">
+              Upload Profile Photo
             </span>
             <input
               type="file"
@@ -122,7 +159,7 @@ const RegisterPage = () => {
                 fileInputRef.current = e;
               }}
             />
-          </div> */}
+          </div>
 
           {/* Full Name */}
           <div className="space-y-2">
