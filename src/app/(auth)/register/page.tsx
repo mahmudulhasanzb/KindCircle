@@ -36,6 +36,20 @@ const RegisterPage = () => {
   const hasMinLength = passwordVal.length >= 6;
   const hasUppercase = /[A-Z]/.test(passwordVal);
   const hasLowercase = /[a-z]/.test(passwordVal);
+  const hasNumber = /[0-9]/.test(passwordVal);
+  const hasSpecial = /[^A-Za-z0-9]/.test(passwordVal);
+
+  const getStrengthScore = () => {
+    if (!passwordVal) return 0;
+    let score = 0;
+    if (hasMinLength) score++;
+    if (hasUppercase && hasLowercase) score++;
+    if (hasNumber) score++;
+    if (hasSpecial) score++;
+    return score;
+  };
+
+  const strengthScore = getStrengthScore();
 
   const handlePhotoClick = () => {
     fileInputRef.current?.click();
@@ -221,6 +235,52 @@ const RegisterPage = () => {
                 )}
               </button>
             </div>
+            {/* Visual Strength Bar */}
+            {passwordVal && (
+              <div className="mt-2 space-y-1.5 animate-in fade-in duration-200">
+                <div className="flex h-1.5 w-full gap-1 rounded-full bg-neutral-900 overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      strengthScore === 1
+                        ? 'w-1/4 bg-danger'
+                        : strengthScore === 2
+                          ? 'w-2/4 bg-accent'
+                          : strengthScore === 3
+                            ? 'w-3/4 bg-secondary'
+                            : strengthScore === 4
+                              ? 'w-full bg-success'
+                              : 'w-0'
+                    }`}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                  <span>Password Strength:</span>
+                  <span
+                    className={
+                      strengthScore === 1
+                        ? 'text-danger'
+                        : strengthScore === 2
+                          ? 'text-accent'
+                          : strengthScore === 3
+                            ? 'text-secondary'
+                            : strengthScore === 4
+                              ? 'text-success'
+                              : 'text-neutral-500'
+                    }
+                  >
+                    {strengthScore === 1
+                      ? 'Weak'
+                      : strengthScore === 2
+                        ? 'Fair'
+                        : strengthScore === 3
+                          ? 'Good'
+                          : strengthScore === 4
+                            ? 'Strong'
+                            : ''}
+                  </span>
+                </div>
+              </div>
+            )}
             {errors.password && (
               <span className="text-danger text-xs">
                 {errors.password.message as string}
