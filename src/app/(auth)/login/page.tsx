@@ -37,6 +37,18 @@ const LoginPage = () => {
     router.push('/');
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: '/',
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error('Google sign in failed');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-neutral-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 text-white font-sans antialiased">
       <div className="w-full max-w-[480px] bg-neutral-800 border border-neutral-700/80 rounded-xl p-8 md:p-10 shadow-2xl backdrop-blur-md">
@@ -146,6 +158,7 @@ const LoginPage = () => {
 
           {/* Google */}
           <button
+            onClick={handleGoogleSignIn}
             type="button"
             className="w-full bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-white font-bold text-xs uppercase py-3.5 rounded-lg cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200"
           >

@@ -1,14 +1,22 @@
 'use client';
 import { authClient } from '@/lib/auth-client';
-import { Check, Eye, EyeOff } from 'lucide-react';
+import {
+  Check,
+  Eye,
+  EyeOff,
+  HeartHandshake,
+  Rocket,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState('supporter');
 
   const {
     register,
@@ -25,15 +33,34 @@ const RegisterPage = () => {
 
   const onSubmit = async (data: any) => {
     const { name, email, password } = data;
-    console.log(data)
-
+    console.log(data);
 
     const { data: authData, error } = await authClient.signUp.email({
-      name,
-      email,
-      password,
+      ...data,
+      role: role,
+      credits: role === 'supporter' ? 50 : 20,
     });
-    console.log({authData, error})
+    console.log(authData);
+    console.log(error);
+
+    if (authData) {
+      toast.success('Registration successful!');
+      router.push('/');
+    }
+    if (error) {
+      toast.error(error.message as string);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: '/',
+      });
+    } catch (error: any) {
+      toast.error(error.message as string);
+    }
   };
 
   return (
@@ -173,7 +200,9 @@ const RegisterPage = () => {
                 <Check className="w-3 h-3 stroke-[3]" />
               </span>
               <span
-                className={hasMinLength ? 'text-neutral-200' : 'text-neutral-500'}
+                className={
+                  hasMinLength ? 'text-neutral-200' : 'text-neutral-500'
+                }
               >
                 6+ characters
               </span>
@@ -185,7 +214,9 @@ const RegisterPage = () => {
                 <Check className="w-3 h-3 stroke-[3]" />
               </span>
               <span
-                className={hasUppercase ? 'text-neutral-200' : 'text-neutral-500'}
+                className={
+                  hasUppercase ? 'text-neutral-200' : 'text-neutral-500'
+                }
               >
                 1 uppercase letter
               </span>
@@ -197,10 +228,57 @@ const RegisterPage = () => {
                 <Check className="w-3 h-3 stroke-[3]" />
               </span>
               <span
-                className={hasLowercase ? 'text-neutral-200' : 'text-neutral-500'}
+                className={
+                  hasLowercase ? 'text-neutral-200' : 'text-neutral-500'
+                }
               >
                 1 lowercase letter
               </span>
+            </div>
+          </div>
+
+          {/* User role selection */}
+          <div>
+            <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">
+              I am a…
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <button
+                className={`w-full rounded-2xl border-2 px-4 py-3 text-left font-semibold transition-colors cursor-pointer ${
+                  role === 'supporter'
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-background hover:border-primary/40'
+                }`}
+                type="button"
+                onClick={() => {
+                  setRole('supporter');
+                }}
+              >
+                <span className="flex items-center gap-2">
+                  <HeartHandshake className="w-4 h-4" /> Supporter
+                </span>
+                <span className="text-xs text-neutral-500">
+                  Start with 50 credits
+                </span>
+              </button>
+              <button
+                className={`w-full rounded-2xl border-2 px-4 py-3 text-left font-semibold transition-colors cursor-pointer ${
+                  role === 'creator'
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-background hover:border-primary/40'
+                }`}
+                type="button"
+                onClick={() => {
+                  setRole('creator');
+                }}
+              >
+                <span className="flex items-center gap-2">
+                  <Rocket className="w-4 h-4" /> Creator
+                </span>
+                <span className="text-xs text-neutral-500">
+                  Start with 20 credits
+                </span>
+              </button>
             </div>
           </div>
 
@@ -250,7 +328,7 @@ const RegisterPage = () => {
 
           {/* Google Signup Button */}
           <button
-            // onClick={handleGoogleSignIn}
+            onClick={handleGoogleSignIn}
             type="button"
             className="w-full bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-white font-bold text-xs uppercase py-3.5 rounded-lg cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200"
           >
@@ -278,4 +356,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-
