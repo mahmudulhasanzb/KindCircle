@@ -177,7 +177,7 @@ const DashboardSideBar = () => {
   };
 
   return (
-    <aside className="w-64 h-screen sticky top-0 bg-neutral-950 border-r border-neutral-800/80 flex flex-col justify-between z-40 select-none">
+    <aside className="w-[260px] h-screen sticky top-0 bg-neutral-950 border-r border-neutral-800/80 flex flex-col justify-between z-40 select-none">
       {/* Brand Header */}
       <div>
         <div className="h-16 border-b border-neutral-800/80 flex items-center px-6">
