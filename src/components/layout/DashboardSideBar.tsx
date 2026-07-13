@@ -166,7 +166,7 @@ const DashboardSideBar = () => {
         fetchOptions: {
           onSuccess: () => {
             toast.success('Signed out successfully!', { id: toastId });
-            router.push('/login');
+            router.push('/signin');
           },
         },
       });

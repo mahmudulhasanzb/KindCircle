@@ -66,7 +66,7 @@ export default function Navbar() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push('/login');
+          router.push('/signin');
         },
       },
     });
@@ -188,7 +188,7 @@ export default function Navbar() {
                     </div>
                   ) : (
                     <Link
-                      href="/login"
+                      href="/signin"
                       className="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
                     >
                       Sign In
@@ -242,7 +242,7 @@ export default function Navbar() {
             /* Guest State */
             <div className="flex items-center gap-3">
               <Link
-                href="/login"
+                href="/signin"
                 className="rounded-lg border border-neutral-700 bg-transparent px-4 py-2 text-[13px] font-semibold text-neutral-200 transition-colors hover:border-white hover:text-white"
               >
                 Login
@@ -335,7 +335,7 @@ export default function Navbar() {
             ) : (
               <div className="mt-4 grid grid-cols-2 gap-3 px-3">
                 <Link
-                  href="/login"
+                  href="/signin"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex justify-center rounded-lg border border-neutral-700 py-2.5 text-sm font-semibold text-white hover:bg-neutral-800"
                 >

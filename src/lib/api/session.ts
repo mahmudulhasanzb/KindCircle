@@ -15,6 +15,6 @@ export const roleValidator = async (role: 'supporter' | 'creator' | 'admin') => 
   console.log(role, user?.role);
 
   if (!user || user.role !== role) {
-    redirect('/login');
+    redirect('/signin');
   }
 };
