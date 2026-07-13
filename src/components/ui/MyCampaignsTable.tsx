@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Edit2, Trash2, X, Calendar, DollarSign } from 'lucide-react';
+import { Edit2, Trash2, X, Calendar, DollarSign, FolderHeart } from 'lucide-react';
 import type { Campaign } from '@/lib/types/campaign';
 import { updateCampaignAction, deleteCampaignAction } from '@/lib/api/campaigns/actions';
 

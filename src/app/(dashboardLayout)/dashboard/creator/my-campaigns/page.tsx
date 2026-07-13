@@ -3,6 +3,7 @@ import MyCampaignsTable from '@/components/ui/MyCampaignsTable';
 import { getCreatorCampaigns } from '@/lib/api/campaigns/data';
 import { roleValidator, getUser } from '@/lib/api/session';
 import { notFound } from 'next/navigation';
+import type { Campaign } from '@/lib/types/campaign';
 
 export const metadata = {
   title: 'My Campaigns — KindCircle Dashboard',
@@ -20,7 +21,7 @@ export default async function MyCampaignsPage() {
   }
 
   // 3. Fetch campaigns for creator
-  let initialCampaigns = [];
+  let initialCampaigns: Campaign[] = [];
   try {
     initialCampaigns = await getCreatorCampaigns(user.id);
   } catch (error) {
