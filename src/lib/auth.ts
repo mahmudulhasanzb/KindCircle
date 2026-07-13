@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { MongoClient } from 'mongodb';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
-import { type } from 'os';
+import { jwt } from 'better-auth/plugins';
 
 const client = new MongoClient(process.env.MONGODB_URI as string);
 const db = client.db('KindCircle');
@@ -29,7 +29,22 @@ export const auth = betterAuth({
         required: true,
         defaultValue: 50,
       },
-      
     },
   },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const credits = user.role === 'creator' ? 20 : 50;
+          return {
+            data: {
+              ...user,
+              credits,
+            },
+          };
+        },
+      },
+    },
+  },
+  plugins: [jwt()],
 });
