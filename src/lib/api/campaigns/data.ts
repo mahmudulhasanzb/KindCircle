@@ -15,3 +15,15 @@ export async function getCampaigns(filters: CampaignFilters = {}): Promise<Campa
   if (!res.ok) throw new Error('Failed to fetch campaigns');
   return res.json();
 }
+
+export async function getCampaignDetail(id: string): Promise<Campaign> {
+  const res = await fetch(`${baseURL}/api/campaigns/${id}`, {
+    cache: 'no-store', // Fresh data for funding stats & backer count
+  });
+  if (!res.ok) {
+    if (res.status === 404) throw new Error('Campaign not found');
+    throw new Error('Failed to fetch campaign detail');
+  }
+  return res.json();
+}
+

@@ -15,6 +15,7 @@ export interface Campaign {
   amount_raised: number;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
+  backerCount?: number;
 }
 
 export type CampaignSortOption = 'newest' | 'most-funded' | 'ending-soon';
@@ -24,3 +25,15 @@ export interface CampaignFilters {
   search?: string;
   sort?: CampaignSortOption;
 }
+
+export interface Contribution {
+  _id?: string;
+  campaignId: string;
+  campaignTitle: string;
+  supporter_email: string;
+  creator_email: string;
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+}
+
