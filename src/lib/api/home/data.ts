@@ -1,4 +1,4 @@
-import { baseUrl } from '@/lib/api/baseUrl';
+import { baseURL } from '@/lib/api/baseUrl';
 
 export interface PlatformStats {
   totalUsers: number;
@@ -18,7 +18,7 @@ export interface TopCampaign {
 }
 
 export async function getPlatformStats(): Promise<PlatformStats> {
-  const res = await fetch(`${baseUrl}/api/stats/platform`, {
+  const res = await fetch(`${baseURL}/api/stats/platform`, {
     next: { revalidate: 300 }, // 5-minute cache
   });
   if (!res.ok) throw new Error('Failed to fetch platform stats');
@@ -26,7 +26,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
 }
 
 export async function getTopFundedCampaigns(): Promise<TopCampaign[]> {
-  const res = await fetch(`${baseUrl}/api/campaigns/top-funded`, {
+  const res = await fetch(`${baseURL}/api/campaigns/top-funded`, {
     next: { revalidate: 300 }, // 5-minute cache
   });
   if (!res.ok) throw new Error('Failed to fetch top funded campaigns');

@@ -20,7 +20,7 @@ const slides = [
   {
     id: 2,
     heading: 'Your Credits, Their Dreams',
-    subtitle: 'Every credit you give turns someone's vision into reality. Start supporting today.',
+    subtitle: "Every credit you give turns someone's vision into reality. Start supporting today.",
     cta: 'Become a Supporter',
     href: '/sign-up',
     gradient: 'from-secondary/90 via-secondary/70 to-primary/80',
