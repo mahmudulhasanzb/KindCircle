@@ -1,6 +1,6 @@
 'use server';
 
-import { serverMutation } from '@/lib/api/server';
+import { serverMutation, deleteMutation } from '@/lib/api/server';
 import { revalidatePath } from 'next/cache';
 
 export async function submitContributionAction(campaignId: string, amount: number) {
@@ -40,4 +40,36 @@ export async function createCampaignAction(data: {
     return { message: error.message || 'Failed to submit campaign' };
   }
 }
+
+export async function updateCampaignAction(id: string, data: {
+  title?: string;
+  story?: string;
+  reward_info?: string;
+}) {
+  try {
+    const res = await serverMutation(`/api/campaigns/${id}`, 'PUT', data);
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath(`/campaigns/${id}`);
+      revalidatePath('/campaigns');
+      revalidatePath('/');
+    }
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to update campaign' };
+  }
+}
+
+export async function deleteCampaignAction(id: string) {
+  try {
+    const res = await deleteMutation(`/api/campaigns/${id}`);
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/campaigns');
+      revalidatePath('/');
+    }
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to delete campaign' };
+  }
+}
+
 

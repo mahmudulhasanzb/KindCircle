@@ -27,3 +27,9 @@ export async function getCampaignDetail(id: string): Promise<Campaign> {
   return res.json();
 }
 
+export async function getCreatorCampaigns(userId: string): Promise<Campaign[]> {
+  const { serverFetch } = await import('@/lib/api/server');
+  return serverFetch(`/api/campaigns/creator/${userId}`);
+}
+
+
