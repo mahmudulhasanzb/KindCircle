@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import CampaignGrid from '@/components/ui/CampaignGrid';
 import { getCampaigns } from '@/lib/api/campaigns/data';
-import type { CampaignFilters } from '@/lib/types/campaign';
+import type { Campaign, CampaignFilters } from '@/lib/types/campaign';
 
 export const metadata = {
   title: 'Explore Campaigns — KindCircle',
@@ -21,7 +21,7 @@ export default async function CampaignsPage({ searchParams }: CampaignsPageProps
   };
 
   // Server-side initial fetch with graceful fallback
-  let initialCampaigns = [];
+  let initialCampaigns: Campaign[] = [];
   try {
     initialCampaigns = await getCampaigns(filters);
   } catch {
