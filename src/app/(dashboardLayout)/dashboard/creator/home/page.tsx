@@ -1,6 +1,7 @@
 import React from 'react';
 import PendingContributionsTable from '@/components/ui/PendingContributionsTable';
 import DashboardStatCard from '@/components/ui/DashboardStatCard';
+import CreatorStatsChart from '@/components/ui/CreatorStatsChart';
 import { getPendingContributions, getCreatorStats } from '@/lib/api/campaigns/data';
 import { roleValidator, getUser } from '@/lib/api/session';
 import { notFound } from 'next/navigation';
@@ -44,7 +45,7 @@ export default async function CreatorDashboardHome() {
   }
 
   let pendingContributions: any[] = [];
-  let stats = { totalCampaigns: 0, activeCampaigns: 0, totalRaised: 0 };
+  let stats: any = { totalCampaigns: 0, activeCampaigns: 0, totalRaised: 0, campaigns: [] };
 
   await Promise.allSettled([
     getPendingContributions(user.email).then((d) => { pendingContributions = d; }).catch(() => {}),
@@ -84,6 +85,9 @@ export default async function CreatorDashboardHome() {
           accent="warning"
         />
       </div>
+
+      {/* Charts Section */}
+      <CreatorStatsChart campaigns={stats.campaigns || []} />
 
       {/* Pending Contributions Section */}
       <div className="space-y-4">
