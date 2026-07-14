@@ -12,7 +12,7 @@ export default function DashboardRedirectPage() {
     if (isPending) return;
 
     if (!session || !session.user) {
-      router.replace('/login');
+      router.replace('/signin');
       return;
     }
 
@@ -26,7 +26,7 @@ export default function DashboardRedirectPage() {
     } else if (role === 'admin') {
       router.replace('/dashboard/admin/home');
     } else {
-      router.replace('/login');
+      router.replace('/signin');
     }
   }, [session, isPending, router]);
 
