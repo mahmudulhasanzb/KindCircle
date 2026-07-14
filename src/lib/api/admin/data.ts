@@ -22,3 +22,7 @@ export async function getAdminUsers(): Promise<any[]> {
 export async function getAdminCampaigns(): Promise<any[]> {
   return serverFetch('/api/admin/campaigns');
 }
+
+export async function getPendingWithdrawals(): Promise<any[]> {
+  return serverFetch('/api/withdrawals/pending');
+}
