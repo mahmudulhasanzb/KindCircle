@@ -1,6 +1,6 @@
 'use server';
 
-import { serverMutation } from '@/lib/api/server';
+import { serverMutation, deleteMutation } from '@/lib/api/server';
 import { revalidatePath } from 'next/cache';
 
 export async function approveCampaignAction(id: string) {
@@ -31,5 +31,35 @@ export async function rejectCampaignAction(id: string) {
     return res;
   } catch (error: any) {
     return { message: error.message || 'Failed to reject campaign' };
+  }
+}
+
+export async function deleteUserAction(id: string) {
+  try {
+    const res = await deleteMutation(`/api/admin/users/${id}`);
+
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/admin/users');
+      revalidatePath('/dashboard/admin/home');
+    }
+
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to delete user' };
+  }
+}
+
+export async function updateUserRoleAction(id: string, role: string) {
+  try {
+    const res = await serverMutation(`/api/admin/users/${id}/role`, 'PATCH', { role });
+
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/admin/users');
+      revalidatePath('/dashboard/admin/home');
+    }
+
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to update user role' };
   }
 }
