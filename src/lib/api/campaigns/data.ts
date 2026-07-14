@@ -57,6 +57,7 @@ export async function getCreatorStats(userId: string): Promise<{
   totalCampaigns: number;
   activeCampaigns: number;
   totalRaised: number;
+  campaigns?: any[];
 }> {
   const { serverFetch } = await import('@/lib/api/server');
   return serverFetch(`/api/creator/stats/${userId}`);
