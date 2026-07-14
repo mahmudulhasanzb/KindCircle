@@ -10,7 +10,7 @@ export async function getCampaigns(filters: CampaignFilters = {}): Promise<Campa
   const url = `${baseURL}/api/campaigns${params.toString() ? `?${params.toString()}` : ''}`;
 
   const res = await fetch(url, {
-    cache: 'no-store', // Always fresh for filter changes
+    cache: 'no-store',
   });
   if (!res.ok) throw new Error('Failed to fetch campaigns');
   return res.json();
@@ -18,7 +18,7 @@ export async function getCampaigns(filters: CampaignFilters = {}): Promise<Campa
 
 export async function getCampaignDetail(id: string): Promise<Campaign> {
   const res = await fetch(`${baseURL}/api/campaigns/${id}`, {
-    cache: 'no-store', // Fresh data for funding stats & backer count
+    cache: 'no-store',
   });
   if (!res.ok) {
     if (res.status === 404) throw new Error('Campaign not found');
@@ -52,7 +52,30 @@ export async function getSupporterContributions(
   return serverFetch(`/api/contributions/supporter/${email}?page=${page}&limit=${limit}`);
 }
 
+// T-15.1 — Creator dashboard stats
+export async function getCreatorStats(userId: string): Promise<{
+  totalCampaigns: number;
+  activeCampaigns: number;
+  totalRaised: number;
+}> {
+  const { serverFetch } = await import('@/lib/api/server');
+  return serverFetch(`/api/creator/stats/${userId}`);
+}
 
-
-
-
+// T-15.3 — Supporter dashboard stats
+export async function getSupporterStats(email: string): Promise<{
+  totalContributions: number;
+  pendingContributions: number;
+  totalApprovedAmount: number;
+  approvedContributions: Array<{
+    _id: string;
+    campaignTitle: string;
+    amount: number;
+    creator_name: string;
+    status: string;
+    createdAt: string;
+  }>;
+}> {
+  const { serverFetch } = await import('@/lib/api/server');
+  return serverFetch(`/api/supporter/stats/${email}`);
+}
