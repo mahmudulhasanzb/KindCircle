@@ -6,7 +6,7 @@ import { Menu, X, Coins, Bell, User } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import Link from 'next/link';
 import NotificationPopup from '@/components/layout/NotificationPopup';
-import { getUserNotifications } from '@/lib/api/notifications/data';
+import { getUserNotificationsAction } from '@/lib/api/notifications/actions';
 import { Notification } from '@/lib/types/notification';
 
 export default function DashboardLayout({
@@ -24,7 +24,7 @@ export default function DashboardLayout({
   const fetchNotifications = async () => {
     if (user?.email) {
       try {
-        const data = await getUserNotifications(user.email);
+        const data = await getUserNotificationsAction(user.email);
         setNotifications(data);
         if (data.length > 0) {
           setShowBadge(true);
