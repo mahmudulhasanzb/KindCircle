@@ -79,3 +79,33 @@ export async function deleteCampaignAction(id: string) {
     return { message: error.message || 'Failed to delete campaign' };
   }
 }
+
+export async function approveWithdrawalAction(id: string) {
+  try {
+    const res = await serverMutation(`/api/withdrawals/${id}/approve`, 'PATCH', {});
+
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/admin/withdrawals');
+      revalidatePath('/dashboard/admin/home');
+    }
+
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to approve withdrawal' };
+  }
+}
+
+export async function rejectWithdrawalAction(id: string) {
+  try {
+    const res = await serverMutation(`/api/withdrawals/${id}/reject`, 'PATCH', {});
+
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/admin/withdrawals');
+      revalidatePath('/dashboard/admin/home');
+    }
+
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to reject withdrawal' };
+  }
+}
