@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { getCampaignDetail } from '@/lib/api/campaigns/data';
 import { getUser } from '@/lib/api/session';
 import ContributionForm from '@/components/ui/ContributionForm';
+import ReportCampaignButton from '@/components/ui/ReportCampaignButton';
 
 interface CampaignDetailPageProps {
   params: Promise<{ id: string }>;
@@ -195,13 +196,20 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
               )}
             </div>
 
-            {/* Contribution Form */}
             {daysLeft > 0 && (
               <ContributionForm
                 campaignId={campaign._id}
                 minimumContribution={campaign.minimum_contribution}
                 creatorEmail={campaign.creator_email}
                 user={loggedInUser}
+              />
+            )}
+
+            {loggedInUser?.role === 'supporter' && (
+              <ReportCampaignButton
+                campaignId={campaign._id}
+                reporterName={loggedInUser.name}
+                reporterEmail={loggedInUser.email}
               />
             )}
 
