@@ -72,4 +72,30 @@ export async function deleteCampaignAction(id: string) {
   }
 }
 
+export async function approveContributionAction(id: string) {
+  try {
+    const res = await serverMutation(`/api/contributions/${id}/approve`, 'PATCH', {});
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/creator/home');
+      revalidatePath('/campaigns');
+    }
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to approve contribution' };
+  }
+}
+
+export async function rejectContributionAction(id: string) {
+  try {
+    const res = await serverMutation(`/api/contributions/${id}/reject`, 'PATCH', {});
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/creator/home');
+    }
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to reject contribution' };
+  }
+}
+
+
 
