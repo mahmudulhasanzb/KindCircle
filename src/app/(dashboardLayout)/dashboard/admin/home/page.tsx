@@ -1,8 +1,10 @@
-'use client';
+import React, { Suspense } from 'react';
+import { getAdminStats } from '@/lib/api/admin/data';
 
-import React, { useEffect, useState } from 'react';
-import { getAdminStats, AdminStats } from '@/lib/api/admin/data';
-import toast from 'react-hot-toast';
+export const metadata = {
+  title: 'Admin Dashboard — KindCircle',
+  description: 'Overview of system growth, user metrics, and payment transactions.',
+};
 
 function IconSupporters() {
   return (
@@ -42,24 +44,37 @@ function IconPayments() {
   );
 }
 
-export default function AdminDashboardHome() {
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [loading, setLoading] = useState(true);
+function StatsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={index}
+          className="animate-pulse rounded-2xl border border-neutral-800/70 bg-neutral-900/60 p-6 space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <div className="h-4 bg-neutral-800 rounded w-1/2" />
+            <div className="h-8 w-8 bg-neutral-800 rounded-lg" />
+          </div>
+          <div className="h-8 bg-neutral-800 rounded w-3/4" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  useEffect(() => {
-    async function loadStats() {
-      try {
-        const data = await getAdminStats();
-        setStats(data);
-      } catch (error) {
-        console.error('Failed to fetch admin stats:', error);
-        toast.error('Failed to load system statistics.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadStats();
-  }, []);
+async function AdminStatsGrid() {
+  let stats;
+  try {
+    stats = await getAdminStats();
+  } catch (error) {
+    console.error('Failed to fetch admin stats:', error);
+    return (
+      <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 text-center text-rose-400 text-sm">
+        Failed to load system statistics. Please try again later.
+      </div>
+    );
+  }
 
   const cardsData = [
     {
@@ -89,6 +104,33 @@ export default function AdminDashboardHome() {
   ];
 
   return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {cardsData.map((card, index) => (
+        <div
+          key={index}
+          className="rounded-2xl border border-neutral-800/70 bg-neutral-900/60 p-6 shadow-sm flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-semibold text-neutral-400">
+              {card.label}
+            </span>
+            <div className={`p-2 rounded-lg border ${card.accent}`}>
+              {card.icon}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-white tracking-tight">
+              {card.value}
+            </h3>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function AdminDashboardHomePage() {
+  return (
     <div className="space-y-8">
       <div className="flex flex-col gap-1.5 pb-5 border-b border-neutral-800/80">
         <h1 className="text-2xl font-bold text-white tracking-tight">
@@ -99,41 +141,9 @@ export default function AdminDashboardHome() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {loading
-          ? Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="animate-pulse rounded-2xl border border-neutral-800/70 bg-neutral-900/60 p-6 space-y-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="h-4 bg-neutral-800 rounded w-1/2" />
-                  <div className="h-8 w-8 bg-neutral-800 rounded-lg" />
-                </div>
-                <div className="h-8 bg-neutral-800 rounded w-3/4" />
-              </div>
-            ))
-          : cardsData.map((card, index) => (
-              <div
-                key={index}
-                className="rounded-2xl border border-neutral-800/70 bg-neutral-900/60 p-6 shadow-sm flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-semibold text-neutral-400">
-                    {card.label}
-                  </span>
-                  <div className={`p-2 rounded-lg border ${card.accent}`}>
-                    {card.icon}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white tracking-tight">
-                    {card.value}
-                  </h3>
-                </div>
-              </div>
-            ))}
-      </div>
+      <Suspense fallback={<StatsSkeleton />}>
+        <AdminStatsGrid />
+      </Suspense>
     </div>
   );
 }
