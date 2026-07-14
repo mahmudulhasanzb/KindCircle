@@ -1,6 +1,8 @@
 import React, { Suspense } from 'react';
 import { getAdminStats } from '@/lib/api/admin/data';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Admin Dashboard — KindCircle',
   description: 'Overview of system growth, user metrics, and payment transactions.',
