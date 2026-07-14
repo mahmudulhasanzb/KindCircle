@@ -10,3 +10,7 @@ export interface AdminStats {
 export async function getAdminStats(): Promise<AdminStats> {
   return serverFetch('/api/admin/stats');
 }
+
+export async function getPendingCampaigns(): Promise<any[]> {
+  return serverFetch('/api/admin/campaigns/pending');
+}
