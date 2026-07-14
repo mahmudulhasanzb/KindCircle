@@ -37,6 +37,22 @@ export async function getPendingContributions(creatorEmail: string): Promise<any
   return serverFetch(`/api/contributions/pending/${creatorEmail}`);
 }
 
+export async function getSupporterContributions(
+  email: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<{
+  contributions: any[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}> {
+  const { serverFetch } = await import('@/lib/api/server');
+  return serverFetch(`/api/contributions/supporter/${email}?page=${page}&limit=${limit}`);
+}
+
+
 
 
 
