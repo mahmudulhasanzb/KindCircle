@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardSideBar from '@/components/layout/DashboardSideBar';
 import { Menu, X, Coins, Bell, User } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import Link from 'next/link';
+import NotificationPopup from '@/components/layout/NotificationPopup';
+import { getUserNotifications } from '@/lib/api/notifications/data';
+import { Notification } from '@/lib/types/notification';
 
 export default function DashboardLayout({
   children,
@@ -12,8 +15,32 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showBadge, setShowBadge] = useState(false);
   const { data: session } = authClient.useSession();
   const user = session?.user as any;
+
+  const fetchNotifications = async () => {
+    if (user?.email) {
+      try {
+        const data = await getUserNotifications(user.email);
+        setNotifications(data);
+        if (data.length > 0) {
+          setShowBadge(true);
+        }
+      } catch (err) {
+        console.error('Failed to load notifications:', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Refresh notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user?.email]);
 
   return (
     <div className="flex h-screen w-full bg-neutral-900 text-white overflow-hidden font-sans">
@@ -84,10 +111,27 @@ export default function DashboardLayout({
             )}
 
             {/* Notification Bell */}
-            <button className="relative p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-all duration-200">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-neutral-900" />
-            </button>
+            <div className="relative">
+              <button
+                data-bell-button
+                onClick={() => {
+                  setNotificationsOpen(!notificationsOpen);
+                  setShowBadge(false); // clear dot when opening
+                }}
+                className="relative p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-all duration-200"
+              >
+                <Bell className="h-5 w-5" />
+                {showBadge && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-neutral-900 animate-pulse" />
+                )}
+              </button>
+              <NotificationPopup
+                isOpen={notificationsOpen}
+                onClose={() => setNotificationsOpen(false)}
+                notifications={notifications}
+                onRefresh={fetchNotifications}
+              />
+            </div>
 
             {/* Profile Avatar / User Identity */}
             {user && (
