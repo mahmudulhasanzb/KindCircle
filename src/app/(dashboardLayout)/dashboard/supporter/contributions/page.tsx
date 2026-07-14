@@ -29,7 +29,12 @@ export default async function SupporterContributionsPage({ searchParams }: Suppo
   const limit = 5; // 5 contributions per page as required
 
   // 4. Fetch contributions data
-  let data = {
+  let data: {
+    contributions: any[];
+    total: number;
+    totalPages: number;
+    currentPage: number;
+  } = {
     contributions: [],
     total: 0,
     totalPages: 1,
