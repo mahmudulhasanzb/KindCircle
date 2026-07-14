@@ -14,3 +14,7 @@ export async function getAdminStats(): Promise<AdminStats> {
 export async function getPendingCampaigns(): Promise<any[]> {
   return serverFetch('/api/admin/campaigns/pending');
 }
+
+export async function getAdminUsers(): Promise<any[]> {
+  return serverFetch('/api/admin/users');
+}
