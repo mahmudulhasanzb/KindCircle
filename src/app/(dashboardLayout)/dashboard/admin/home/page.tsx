@@ -65,8 +65,10 @@ function StatsSkeleton() {
   );
 }
 
+import AdminStatsChart from '@/components/ui/AdminStatsChart';
+
 async function AdminStatsGrid() {
-  let stats;
+  let stats: any;
   try {
     stats = await getAdminStats();
   } catch (error) {
@@ -93,7 +95,7 @@ async function AdminStatsGrid() {
     },
     {
       label: 'Total System Credits',
-      value: stats?.totalCredits.toLocaleString() ?? '0',
+      value: stats?.totalCredits?.toLocaleString() ?? '0',
       icon: <IconCredits />,
       accent: 'border-amber-500/30 text-amber-400 bg-amber-500/5',
     },
@@ -106,27 +108,31 @@ async function AdminStatsGrid() {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cardsData.map((card, index) => (
-        <div
-          key={index}
-          className="rounded-2xl border border-neutral-800/70 bg-neutral-900/60 p-6 shadow-sm flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-semibold text-neutral-400">
-              {card.label}
-            </span>
-            <div className={`p-2 rounded-lg border ${card.accent}`}>
-              {card.icon}
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cardsData.map((card, index) => (
+          <div
+            key={index}
+            className="rounded-2xl border border-neutral-800/70 bg-neutral-900/60 p-6 shadow-sm flex flex-col justify-between"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-semibold text-neutral-400">
+                {card.label}
+              </span>
+              <div className={`p-2 rounded-lg border ${card.accent}`}>
+                {card.icon}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white tracking-tight">
+                {card.value}
+              </h3>
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-bold text-white tracking-tight">
-              {card.value}
-            </h3>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
+
+      <AdminStatsChart trends={stats?.contributionTrends || []} />
     </div>
   );
 }
