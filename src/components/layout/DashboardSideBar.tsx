@@ -19,6 +19,7 @@ import {
   User,
   ChevronDown,
   LogOut,
+  CheckSquare,
 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -89,6 +90,11 @@ const adminMenu = [
     label: 'Manage Users',
     href: '/dashboard/admin/users',
     icon: Users,
+  },
+  {
+    label: 'Campaign Approvals',
+    href: '/dashboard/admin/campaigns-approval',
+    icon: CheckSquare,
   },
   {
     label: 'Manage Campaigns',
