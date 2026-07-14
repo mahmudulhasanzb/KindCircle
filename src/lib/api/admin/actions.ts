@@ -63,3 +63,19 @@ export async function updateUserRoleAction(id: string, role: string) {
     return { message: error.message || 'Failed to update user role' };
   }
 }
+
+export async function deleteCampaignAction(id: string) {
+  try {
+    const res = await deleteMutation(`/api/admin/campaigns/${id}`);
+
+    if (res && !res.message?.includes('failed') && !res.error) {
+      revalidatePath('/dashboard/admin/campaigns');
+      revalidatePath('/dashboard/admin/home');
+      revalidatePath('/campaigns');
+    }
+
+    return res;
+  } catch (error: any) {
+    return { message: error.message || 'Failed to delete campaign' };
+  }
+}
