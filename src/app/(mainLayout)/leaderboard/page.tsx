@@ -86,7 +86,7 @@ export default async function LeaderboardPage() {
                     <div className="relative">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
-                        src={topSupporters[1].photoUrl || '/avatar-placeholder.png'} 
+                        src={topSupporters[1].photoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(topSupporters[1].name)}`} 
                         alt={topSupporters[1].name}
                         className="h-20 w-20 rounded-full border-4 border-neutral-400 object-cover shadow-lg shadow-neutral-400/10"
                       />
@@ -114,7 +114,7 @@ export default async function LeaderboardPage() {
                       <Crown className="absolute -top-7 left-1/2 -translate-x-1/2 text-yellow-500" size={28} />
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
-                        src={topSupporters[0].photoUrl || '/avatar-placeholder.png'} 
+                        src={topSupporters[0].photoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(topSupporters[0].name)}`} 
                         alt={topSupporters[0].name}
                         className="h-24 w-24 rounded-full border-4 border-yellow-500 object-cover shadow-xl shadow-yellow-500/10"
                       />
@@ -140,7 +140,7 @@ export default async function LeaderboardPage() {
                     <div className="relative">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
-                        src={topSupporters[2].photoUrl || '/avatar-placeholder.png'} 
+                        src={topSupporters[2].photoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(topSupporters[2].name)}`} 
                         alt={topSupporters[2].name}
                         className="h-20 w-20 rounded-full border-4 border-amber-700 object-cover shadow-lg shadow-amber-700/10"
                       />
@@ -193,7 +193,7 @@ export default async function LeaderboardPage() {
                             <div className="flex items-center gap-3">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img 
-                                src={supporter.photoUrl || '/avatar-placeholder.png'} 
+                                src={supporter.photoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(supporter.name)}`} 
                                 alt={supporter.name} 
                                 className="h-9 w-9 rounded-full object-cover border border-neutral-800"
                               />
