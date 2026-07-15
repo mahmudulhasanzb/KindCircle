@@ -24,7 +24,10 @@ export interface CampaignFilters {
   category?: string;
   search?: string;
   sort?: CampaignSortOption;
+  page?: number;
+  limit?: number;
 }
+
 
 export interface Contribution {
   _id?: string;

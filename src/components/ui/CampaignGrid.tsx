@@ -5,6 +5,8 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import CampaignCard from '@/components/ui/CampaignCard';
 import type { Campaign, CampaignSortOption } from '@/lib/types/campaign';
+import { Pagination } from '@heroui/react';
+import Link from 'next/link';
 
 const CATEGORIES = [
   { value: 'all', label: 'All Categories' },
@@ -55,6 +57,8 @@ interface CampaignGridProps {
   initialCategory: string;
   initialSearch: string;
   initialSort: string;
+  initialTotalPages: number;
+  initialCurrentPage: number;
 }
 
 export default function CampaignGrid({
@@ -62,6 +66,8 @@ export default function CampaignGrid({
   initialCategory,
   initialSearch,
   initialSort,
+  initialTotalPages,
+  initialCurrentPage,
 }: CampaignGridProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -71,16 +77,19 @@ export default function CampaignGrid({
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCategory || 'all');
   const [sort, setSort] = useState(initialSort || 'newest');
+  const [totalPages, setTotalPages] = useState(initialTotalPages || 1);
+  const [currentPage, setCurrentPage] = useState(initialCurrentPage || 1);
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
 
   // Update URL and re-fetch when filters change
   const applyFilters = useCallback(
-    (newCategory: string, newSort: string, newSearch: string) => {
+    (newCategory: string, newSort: string, newSearch: string, newPage: number) => {
       const params = new URLSearchParams();
       if (newCategory && newCategory !== 'all') params.set('category', newCategory);
       if (newSearch.trim()) params.set('search', newSearch.trim());
       if (newSort && newSort !== 'newest') params.set('sort', newSort);
+      if (newPage > 1) params.set('page', String(newPage));
 
       startTransition(() => {
         router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, {
@@ -96,6 +105,7 @@ export default function CampaignGrid({
     const cat = searchParams.get('category') || 'all';
     const srch = searchParams.get('search') || '';
     const srt = searchParams.get('sort') || 'newest';
+    const pg = parseInt(searchParams.get('page') || '1') || 1;
 
     setIsLoading(true);
 
@@ -103,6 +113,8 @@ export default function CampaignGrid({
     if (cat !== 'all') params.set('category', cat);
     if (srch) params.set('search', srch);
     if (srt !== 'newest') params.set('sort', srt);
+    if (pg > 1) params.set('page', String(pg));
+    params.set('limit', '10');
 
     const url = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000'}/api/campaigns${
       params.toString() ? `?${params.toString()}` : ''
@@ -110,35 +122,53 @@ export default function CampaignGrid({
 
     fetch(url)
       .then((r) => r.json())
-      .then((data: Campaign[]) => setCampaigns(data))
-      .catch(() => setCampaigns([]))
+      .then((data: any) => {
+        setCampaigns(data.campaigns || []);
+        setTotalPages(data.totalPages || 1);
+        setCurrentPage(data.currentPage || 1);
+      })
+      .catch(() => {
+        setCampaigns([]);
+        setTotalPages(1);
+        setCurrentPage(1);
+      })
       .finally(() => setIsLoading(false));
   }, [searchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    applyFilters(category, sort, search);
+    applyFilters(category, sort, search, 1);
   }
 
   function handleCategoryChange(val: string) {
     setCategory(val);
-    applyFilters(val, sort, search);
+    applyFilters(val, sort, search, 1);
   }
 
   function handleSortChange(val: string) {
     setSort(val);
-    applyFilters(category, val, search);
+    applyFilters(category, val, search, 1);
   }
 
   function handleSearchClear() {
     setSearch('');
-    applyFilters(category, sort, '');
+    applyFilters(category, sort, '', 1);
   }
+
+  const getPageLink = (pageNumber: number) => {
+    const params = new URLSearchParams();
+    if (category && category !== 'all') params.set('category', category);
+    if (search.trim()) params.set('search', search.trim());
+    if (sort && sort !== 'newest') params.set('sort', sort);
+    if (pageNumber > 1) params.set('page', String(pageNumber));
+    return `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+  };
 
   const loading = isLoading || isPending;
 
   return (
     <div className="space-y-8">
+
       {/* ── Filter Bar ── */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
         {/* Search input */}
@@ -266,6 +296,56 @@ export default function CampaignGrid({
           </AnimatePresence>
         </motion.div>
       )}
+
+      {/* ── Pagination ── */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-12">
+          <Pagination size="md" color="primary" className="dark">
+            <Pagination.Content>
+              <Pagination.Item>
+                <Pagination.Previous
+                  isDisabled={currentPage === 1}
+                  className="bg-neutral-800 text-white hover:bg-neutral-700 p-0"
+                >
+                  <Link className="flex gap-2 px-3 py-1.5 items-center w-full h-full" href={getPageLink(currentPage - 1)}>
+                    <Pagination.PreviousIcon />
+                    Prev
+                  </Link>
+                </Pagination.Previous>
+              </Pagination.Item>
+
+              {Array.from({ length: totalPages }).map((_, idx) => {
+                const p = idx + 1;
+                return (
+                  <Pagination.Item key={p}>
+                    <Link href={getPageLink(p)}>
+                      <Pagination.Link
+                        isActive={p === currentPage}
+                        className={p === currentPage ? 'bg-[var(--primary)] text-white' : 'bg-neutral-800 text-white hover:bg-neutral-700'}
+                      >
+                        {p}
+                      </Pagination.Link>
+                    </Link>
+                  </Pagination.Item>
+                );
+              })}
+
+              <Pagination.Item>
+                <Pagination.Next
+                  isDisabled={currentPage === totalPages}
+                  className="bg-neutral-800 text-white hover:bg-neutral-700 p-0"
+                >
+                  <Link className="flex gap-2 px-3 py-1.5 items-center w-full h-full" href={getPageLink(currentPage + 1)}>
+                    Next
+                    <Pagination.NextIcon />
+                  </Link>
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }
+

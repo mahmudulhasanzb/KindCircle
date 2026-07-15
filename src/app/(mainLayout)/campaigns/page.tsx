@@ -9,23 +9,32 @@ export const metadata = {
 };
 
 interface CampaignsPageProps {
-  searchParams: Promise<{ category?: string; search?: string; sort?: string }>;
+  searchParams: Promise<{ category?: string; search?: string; sort?: string; page?: string }>;
 }
 
 export default async function CampaignsPage({ searchParams }: CampaignsPageProps) {
   const params = await searchParams;
+  const page = parseInt(params.page || '1') || 1;
   const filters: CampaignFilters = {
     category: params.category,
     search: params.search,
     sort: (params.sort as CampaignFilters['sort']) || 'newest',
+    page,
+    limit: 10,
   };
 
   // Server-side initial fetch with graceful fallback
-  let initialCampaigns: Campaign[] = [];
+  let campaigns: Campaign[] = [];
+  let totalPages = 1;
+  let currentPage = 1;
+
   try {
-    initialCampaigns = await getCampaigns(filters);
-  } catch {
-    initialCampaigns = [];
+    const data = await getCampaigns(filters);
+    campaigns = data.campaigns || [];
+    totalPages = data.totalPages || 1;
+    currentPage = data.currentPage || 1;
+  } catch (err) {
+    console.error('Failed to load initial campaigns:', err);
   }
 
   return (
@@ -69,13 +78,16 @@ export default async function CampaignsPage({ searchParams }: CampaignsPageProps
           }
         >
           <CampaignGrid
-            initialCampaigns={initialCampaigns}
+            initialCampaigns={campaigns}
             initialCategory={params.category || 'all'}
             initialSearch={params.search || ''}
             initialSort={params.sort || 'newest'}
+            initialTotalPages={totalPages}
+            initialCurrentPage={currentPage}
           />
         </Suspense>
       </div>
     </div>
   );
 }
+
