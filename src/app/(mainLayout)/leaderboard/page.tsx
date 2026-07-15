@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { 
   Trophy, 
@@ -13,69 +11,41 @@ import {
   TrendingUp,
   Coins
 } from 'lucide-react';
-import { getLeaderboard, LeaderboardResponse } from '@/lib/api/leaderboard/data';
-import { authClient } from '@/lib/auth-client';
+import { getLeaderboard } from '@/lib/api/leaderboard/data';
+import { getUser } from '@/lib/api/session';
 
-export default function LeaderboardPage() {
-  const { data: session, isPending: sessionLoading } = authClient.useSession();
-  const [data, setData] = useState<LeaderboardResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const metadata = {
+  title: 'Kindness Leaderboard — KindCircle',
+  description: 'Celebrating the top benefactors and most successful campaigns making a difference in the KindCircle community.',
+};
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const res = await getLeaderboard();
-        setData(res);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load leaderboard data. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [session]);
-
-  const user = session?.user;
-
-  if (loading || sessionLoading) {
-    return (
-      <div className="w-full min-h-screen bg-neutral-950 text-white py-20 px-4 flex flex-col items-center justify-center">
-        <div className="relative flex items-center justify-center">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-neutral-800 border-t-primary" />
-          <Trophy className="absolute text-primary" size={24} />
-        </div>
-        <p className="mt-4 text-neutral-400 text-sm animate-pulse">Calculating rankings...</p>
-      </div>
-    );
+export default async function LeaderboardPage() {
+  const user = await getUser();
+  
+  let data;
+  try {
+    data = await getLeaderboard();
+  } catch (err) {
+    console.error('Failed to load leaderboard:', err);
   }
 
-  if (error || !data) {
+  if (!data) {
     return (
       <div className="w-full min-h-screen bg-neutral-950 text-white py-20 px-4 flex flex-col items-center justify-center">
         <Trophy size={64} className="text-neutral-600 mb-4" />
         <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
-        <p className="text-neutral-400 mb-6">{error || 'Could not fetch leaderboard data.'}</p>
-        <button 
-          onClick={() => window.location.reload()}
+        <p className="text-neutral-400 mb-6">Could not fetch leaderboard data at this time.</p>
+        <Link 
+          href="/"
           className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary/90 transition-colors"
         >
-          Try Again
-        </button>
+          Back to Home
+        </Link>
       </div>
     );
   }
 
   const { topSupporters, topCampaigns, personalStats } = data;
-
-  // Split top supporters into podium and list
-  const podium = [
-    topSupporters[1], // 2nd Place (index 1)
-    topSupporters[0], // 1st Place (index 0)
-    topSupporters[2], // 3rd Place (index 2)
-  ].filter(Boolean);
 
   const listSupporters = topSupporters.slice(3);
 
@@ -141,7 +111,7 @@ export default function LeaderboardPage() {
                   <div className="w-full sm:w-1/3 flex flex-col items-center order-1 sm:order-2">
                     <div className="relative">
                       {/* Crown */}
-                      <Crown className="absolute -top-7 left-1/2 -translate-x-1/2 text-yellow-500 animate-bounce" size={28} />
+                      <Crown className="absolute -top-7 left-1/2 -translate-x-1/2 text-yellow-500" size={28} />
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src={topSupporters[0].photoUrl || '/avatar-placeholder.png'} 
@@ -318,8 +288,7 @@ export default function LeaderboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-neutral-800 border-t-secondary" />
-                  <p className="mt-3 text-neutral-400 text-xs">Loading statistics...</p>
+                  <p className="text-neutral-400 text-xs">No contribution history found.</p>
                 </div>
               )
             ) : (
