@@ -6,6 +6,7 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const slides = [
   {
@@ -14,7 +15,7 @@ const slides = [
     subtitle: 'Back visionary creators and fund the campaigns that matter most to your community.',
     cta: 'Explore Campaigns',
     href: '/campaigns',
-    gradient: 'from-primary/90 via-primary/70 to-secondary/80',
+    image: '/hero_community.png',
     accentColor: '#6366F1',
   },
   {
@@ -23,7 +24,7 @@ const slides = [
     subtitle: "Every credit you give turns someone's vision into reality. Start supporting today.",
     cta: 'Become a Supporter',
     href: '/register',
-    gradient: 'from-secondary/90 via-secondary/70 to-primary/80',
+    image: '/hero_support.png',
     accentColor: '#0EA5E9',
   },
   {
@@ -32,7 +33,7 @@ const slides = [
     subtitle: 'Share your story, set your goal, and let the KindCircle community propel you forward.',
     cta: 'Start a Campaign',
     href: '/register',
-    gradient: 'from-accent/80 via-primary/80 to-secondary/70',
+    image: '/hero_launch.png',
     accentColor: '#F59E0B',
   },
 ];
@@ -51,24 +52,31 @@ export default function HeroSlider() {
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div
-              className={`relative w-full h-full flex items-center justify-center bg-gradient-to-br ${slide.gradient}`}
-              style={{
-                background: `linear-gradient(135deg, var(--primary), var(--secondary))`,
-              }}
-            >
-              {/* Background pattern overlay */}
-              <div
-                className="absolute inset-0 opacity-10"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 25% 35%, ${slide.accentColor} 0%, transparent 50%), radial-gradient(circle at 75% 65%, white 0%, transparent 50%)`,
-                }}
-              />
+            <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-neutral-950">
+              {/* Background Image with Overlay */}
+              <div className="absolute inset-0 z-0">
+                <Image
+                  src={slide.image}
+                  alt=""
+                  fill
+                  priority={slide.id === 1}
+                  className="object-cover opacity-30 select-none pointer-events-none"
+                  sizes="100vw"
+                />
+                {/* Gradient Overlay for extra premium styling */}
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-neutral-950/90 mix-blend-multiply" />
+                <div
+                  className="absolute inset-0 opacity-20"
+                  style={{
+                    backgroundImage: `radial-gradient(circle at 25% 35%, ${slide.accentColor} 0%, transparent 50%), radial-gradient(circle at 75% 65%, var(--neutral-900) 0%, transparent 50%)`,
+                  }}
+                />
+              </div>
 
               {/* Content */}
               <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
                 <h1
-                  className="text-[2rem] md:text-[3rem] font-extrabold text-white leading-tight mb-4 drop-shadow-lg"
+                  className="text-[2rem] md:text-[3.5rem] font-extrabold text-white leading-tight mb-4 drop-shadow-lg"
                   style={{ lineHeight: 1.1 }}
                 >
                   {slide.heading}
@@ -79,7 +87,7 @@ export default function HeroSlider() {
                 <Link
                   href={slide.href}
                   id={`hero-cta-${slide.id}`}
-                  className="inline-flex items-center gap-2 bg-white text-primary font-semibold text-sm px-6 py-3 rounded-lg shadow-lg hover:bg-white/90 transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center gap-2 bg-primary text-white font-semibold text-sm px-6 py-3 rounded-lg shadow-lg hover:bg-primary/90 transition-all duration-200 cursor-pointer"
                   style={{ borderRadius: '8px' }}
                 >
                   {slide.cta}
@@ -95,3 +103,4 @@ export default function HeroSlider() {
     </section>
   );
 }
+

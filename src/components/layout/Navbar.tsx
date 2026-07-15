@@ -92,6 +92,9 @@ export default function Navbar() {
 
           {/* Navigation Links (Desktop) */}
           <div className="hidden items-center gap-6 md:flex">
+            <Link href="/" className={`text-[14px] font-medium transition-colors hover:text-primary ${ isActive('/') ? 'text-primary' : 'text-neutral-400'}`}>
+            Home
+            </Link>
             <Link
               href="/campaigns"
               className={`text-[14px] font-medium transition-colors hover:text-primary ${
