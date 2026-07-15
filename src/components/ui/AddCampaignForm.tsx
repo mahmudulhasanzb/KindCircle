@@ -59,7 +59,7 @@ export default function AddCampaignForm() {
     reader.readAsDataURL(file);
 
     setIsUploading(true);
-    const toastId = toast.loading('Uploading cover image to imgBB...');
+    const toastId = toast.loading('Uploading cover image...');
     try {
       const url = await uploadImage(file);
       if (url) {

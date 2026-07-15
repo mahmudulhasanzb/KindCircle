@@ -43,7 +43,7 @@ export default function DashboardLayout({
   }, [user?.email]);
 
   return (
-    <div className="flex h-screen w-full bg-neutral-900 text-white overflow-hidden font-sans">
+    <div className="flex h-screen w-full bg-neutral-950 text-white overflow-hidden font-sans">
       {/* Desktop Sidebar (Left side, hidden on mobile/tablet) */}
       <div className="hidden lg:block flex-shrink-0">
         <DashboardSideBar />
@@ -78,7 +78,7 @@ export default function DashboardLayout({
       {/* Right Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Dashboard Top Header */}
-        <header className="h-16 border-b border-neutral-800/60 bg-neutral-950/40 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30">
+        <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30" style={{ background: 'rgba(9,9,11,0.7)', borderBottom: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)' }}>
           <div className="flex items-center gap-3">
             {/* Hamburger menu trigger */}
             <button
@@ -104,8 +104,8 @@ export default function DashboardLayout({
           <div className="flex items-center gap-4">
             {/* Credit Counter */}
             {user && (
-              <div className="flex items-center gap-1.5 rounded-lg bg-secondary/15 px-3 py-1.5 text-[13px] font-semibold text-secondary">
-                <Coins size={16} />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold" style={{ background: 'rgba(14,165,233,0.12)', color: '#38BDF8', border: '1px solid rgba(14,165,233,0.2)' }}>
+                <Coins size={14} />
                 <span>{user.credits ?? 0} Credits</span>
               </div>
             )}
@@ -167,7 +167,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Dashboard Scrollable Inner Content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-neutral-900">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" style={{ background: '#0a0a0f' }}>
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

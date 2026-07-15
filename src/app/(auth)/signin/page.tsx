@@ -20,161 +20,173 @@ const LoginPage = () => {
 
   const onSubmit = async (data: any) => {
     const { email, password } = data;
-
-    const { data: authData, error } = await authClient.signIn.email({
-      email,
-      password,
-    });
-
+    const { data: authData, error } = await authClient.signIn.email({ email, password });
     if (error) {
       toast.error(error.message || 'Sign in failed');
       return;
     }
-
     toast.success('Signed in successfully!');
     router.push('/');
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: '/',
-      });
+      await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
     } catch (error) {
       toast.error((error as Error).message || 'Google sign in failed');
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 text-white font-sans antialiased">
-      <div className="w-full max-w-[480px] bg-neutral-800 border border-neutral-700/80 rounded-xl p-8 md:p-10 shadow-2xl backdrop-blur-md">
-        {/* Header */}
-        <div className="mb-8 text-center flex flex-col items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            Welcome Back
-          </h2>
-          <p className="text-neutral-400 text-sm mt-1.5 font-medium">
-            Sign in to your account.
-          </p>
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center py-12 px-4 relative overflow-hidden font-sans antialiased">
+      {/* Ambient orbs */}
+      <div
+        className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)', filter: 'blur(80px)' }}
+      />
+      <div
+        className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)', filter: 'blur(80px)' }}
+      />
+
+      <div className="relative w-full max-w-[440px]">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
+          <Link href="/" className="flex items-center gap-2.5 group mb-6">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl font-black text-sm text-white transition-transform group-hover:scale-105"
+              style={{ background: 'linear-gradient(135deg, #6366F1, #0EA5E9)', boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
+            >
+              KC
+            </div>
+            <span className="font-black text-xl tracking-tight text-white">
+              Kind<span className="text-[#6366F1]">Circle</span>
+            </span>
+          </Link>
+          <h1 className="text-2xl md:text-3xl font-black text-white mb-2" style={{ letterSpacing: '-0.02em' }}>
+            Welcome back
+          </h1>
+          <p className="text-sm text-white/45">Sign in to your account to continue.</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Email */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Email Address
-            </label>
-            <input
-              type="email"
-              {...register('email', { required: 'Email is required' })}
-              placeholder="you@example.com"
-              className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
-            />
-            {errors.email && (
-              <span className="text-danger text-xs">
-                {errors.email.message as string}
-              </span>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Password
-            </label>
-            <div className="relative">
+        {/* Card */}
+        <div
+          className="rounded-2xl border border-white/8 p-8"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            boxShadow: '0 8px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(12px)',
+          }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest">
+                Email Address
+              </label>
               <input
-                type={showPassword ? 'text' : 'password'}
-                {...register('password', { required: 'Password is required' })}
-                placeholder="••••••••"
-                className="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 rounded-lg px-4 py-3 text-sm pr-10 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                type="email"
+                {...register('email', { required: 'Email is required' })}
+                placeholder="you@example.com"
+                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 transition-all duration-200 focus:outline-none"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: errors.email ? '0 0 0 2px rgba(239,68,68,0.4)' : undefined,
+                }}
+                onFocus={(e) => { e.target.style.border = '1px solid rgba(99,102,241,0.6)'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)'; }}
+                onBlur={(e) => { e.target.style.border = '1px solid rgba(255,255,255,0.1)'; e.target.style.boxShadow = ''; }}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 cursor-pointer transition-colors duration-150"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
+              {errors.email && (
+                <span className="text-[#EF4444] text-xs">{errors.email.message as string}</span>
+              )}
             </div>
-            {errors.password && (
-              <span className="text-danger text-xs">
-                {errors.password.message as string}
-              </span>
-            )}
-          </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-primary hover:bg-[#4F46E5] disabled:bg-primary/50 disabled:text-white/50 text-white font-semibold text-sm uppercase py-4 rounded-lg cursor-pointer disabled:cursor-not-allowed shadow-md shadow-primary/10 hover:shadow-primary/20 transition-all duration-200 transform active:scale-98 flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password', { required: 'Password is required' })}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-white/25 transition-all duration-200 focus:outline-none"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                  }}
+                  onFocus={(e) => { e.target.style.border = '1px solid rgba(99,102,241,0.6)'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)'; }}
+                  onBlur={(e) => { e.target.style.border = '1px solid rgba(255,255,255,0.1)'; e.target.style.boxShadow = ''; }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 cursor-pointer transition-colors"
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                <span>Signing In...</span>
-              </>
-            ) : (
-              <span>Sign In</span>
-            )}
-          </button>
-
-          {/* Divider */}
-          <div className="relative py-2 flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-700/60" />
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && (
+                <span className="text-[#EF4444] text-xs">{errors.password.message as string}</span>
+              )}
             </div>
-            <span className="relative bg-neutral-800 px-4 text-[9px] font-extrabold text-neutral-500 uppercase tracking-widest select-none">
-              Or Continue With
-            </span>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-bold text-sm text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(135deg, #6366F1, #0EA5E9)',
+                boxShadow: '0 8px 24px rgba(99,102,241,0.4)',
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                <span>Sign In</span>
+              )}
+            </button>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/8" />
+              </div>
+              <span className="relative px-4 text-[10px] font-black text-white/25 uppercase tracking-widest"
+                style={{ background: 'rgba(10,10,15,0.6)', backdropFilter: 'blur(4px)' }}>
+                Or continue with
+              </span>
+            </div>
+
+            {/* Google */}
+            <button
+              onClick={handleGoogleSignIn}
+              type="button"
+              className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl font-bold text-sm text-white/70 hover:text-white cursor-pointer transition-all duration-200 hover:border-white/20 hover:-translate-y-0.5"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.187 4.114-3.478 0-6.3-2.822-6.3-6.3s2.822-6.3 6.3-6.3c1.63 0 3.106.625 4.22 1.642l3.085-3.085C19.04 2.5 15.9 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.897 0 10.866-4.188 10.866-11.24 0-.768-.078-1.516-.216-2.24H12.24z" />
+              </svg>
+              <span>Google</span>
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-xs text-white/35">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="font-bold text-[#818CF8] hover:text-[#6366F1] transition-colors">
+              Sign Up
+            </Link>
           </div>
-
-          {/* Google */}
-          <button
-            onClick={handleGoogleSignIn}
-            type="button"
-            className="w-full bg-neutral-900 hover:bg-neutral-700 border border-neutral-700 text-white font-bold text-xs uppercase py-3.5 rounded-lg cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.187 4.114-3.478 0-6.3-2.822-6.3-6.3s2.822-6.3 6.3-6.3c1.63 0 3.106.625 4.22 1.642l3.085-3.085C19.04 2.5 15.9 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.897 0 10.866-4.188 10.866-11.24 0-.768-.078-1.516-.216-2.24H12.24z" />
-            </svg>
-            <span>Google</span>
-          </button>
-        </form>
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-xs font-semibold text-neutral-400">
-          Don&apos;t have an account?{' '}
-          <Link
-            href="/register"
-            className="text-primary hover:underline transition-colors duration-200"
-          >
-            Sign Up
-          </Link>
         </div>
       </div>
     </div>

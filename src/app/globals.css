@@ -16,12 +16,151 @@
 
   --background: var(--neutral-50);
   --foreground: #18181B; /* --text-primary (light) */
+
+  /* Glass / surface tokens */
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --surface: rgba(255, 255, 255, 0.03);
+  --glow-primary: rgba(99, 102, 241, 0.35);
+  --glow-secondary: rgba(14, 165, 233, 0.3);
+  --glow-accent: rgba(245, 158, 11, 0.3);
 }
 
 .dark {
   --background: var(--neutral-900);
   --foreground: var(--neutral-50); /* --text-primary (dark) */
 }
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+  
+  --color-text-secondary: var(--text-secondary);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  
+  /* Spacing Scale (8px Base Grid) mapped from DESIGN.md */
+  --spacing-space-1: 4px;
+  --spacing-space-2: 8px;
+  --spacing-space-3: 12px;
+  --spacing-space-4: 16px;
+  --spacing-space-5: 20px;
+  --spacing-space-6: 24px;
+  --spacing-space-8: 32px;
+  --spacing-space-10: 40px;
+  --spacing-space-12: 48px;
+  --spacing-space-16: 64px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+@utility status-chip {
+  @apply rounded-full px-3 py-1 text-[12px] font-medium uppercase tracking-wider inline-flex items-center justify-center;
+}
+
+@utility chip-pending {
+  @apply status-chip bg-accent/15 text-accent;
+}
+
+@utility chip-approved {
+  @apply status-chip bg-success/15 text-success;
+}
+
+@utility chip-rejected {
+  @apply status-chip bg-danger/15 text-danger;
+}
+
+@utility chip-funded {
+  @apply status-chip bg-primary/15 text-primary;
+}
+
+/* ─── Glassmorphism Utility ───────────────────────────────── */
+@utility glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Gradient Text Utility ───────────────────────────────── */
+@utility gradient-text {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Swiper Pagination Custom Styles ────────────────────── */
+.hero-swiper .swiper-pagination-bullet,
+.testimonial-swiper .swiper-pagination-bullet {
+  background: var(--primary);
+  opacity: 0.35;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, width 0.2s ease;
+}
+
+.hero-swiper .swiper-pagination-bullet-active,
+.testimonial-swiper .swiper-pagination-bullet-active {
+  background: var(--primary);
+  opacity: 1;
+  width: 20px;
+}
+
+/* ─── Page Entrance Animation ─────────────────────────────── */
+@utility page-enter {
+  animation: pageEnter 0.4s ease-out both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Float animation for ambient orbs ───────────────────── */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ─── Shimmer animation ───────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  .hero-swiper,
+  .testimonial-swiper {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 
 @theme {
   --color-primary: var(--primary);

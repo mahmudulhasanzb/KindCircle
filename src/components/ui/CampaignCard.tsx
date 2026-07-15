@@ -14,12 +14,12 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
       ? Math.min(Math.round((campaign.amount_raised / campaign.funding_goal) * 100), 100)
       : 0;
 
-  const progressColor =
+  const progressGradient =
     percent >= 100
-      ? 'var(--success)'
+      ? 'from-[#22C55E] to-[#4ADE80]'
       : percent >= 50
-      ? 'var(--primary)'
-      : 'var(--secondary)';
+      ? 'from-[#6366F1] to-[#818CF8]'
+      : 'from-[#0EA5E9] to-[#38BDF8]';
 
   const daysLeft = Math.max(
     0,
@@ -30,33 +30,34 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     <Link
       href={`/campaigns/${campaign._id}`}
       id={`campaign-card-${campaign._id}`}
-      className="group flex flex-col rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-white/5 overflow-hidden transition-all duration-200 hover:shadow-[0_4px_12px_rgba(99,102,241,0.15)] hover:-translate-y-0.5 cursor-pointer h-full"
-      style={{ borderRadius: '12px', willChange: 'transform' }}
+      className="group relative flex flex-col rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:border-white/15 h-full"
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
+        willChange: 'transform',
+      }}
       aria-label={`View campaign: ${campaign.title}`}
     >
+      {/* Hover glow */}
+      <div
+        className="absolute inset-0 rounded-2xl blur-2xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none -z-10"
+        style={{ background: 'rgba(99,102,241,0.4)', transform: 'scale(0.9) translateY(16px)' }}
+      />
+
       {/* Cover Image */}
-      <div className="relative w-full h-[180px] bg-neutral-200 dark:bg-neutral-700 flex-shrink-0 overflow-hidden">
+      <div className="relative w-full h-[190px] bg-white/5 flex-shrink-0 overflow-hidden">
         {campaign.image_url ? (
           <Image
             src={campaign.image_url}
             alt={campaign.title}
-            height={180}
+            height={190}
             width={400}
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105 w-full h-full"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-[var(--primary)]/10">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--primary)"
-              strokeWidth="1.5"
-              opacity="0.4"
-              aria-hidden="true"
-            >
+          <div className="w-full h-full flex items-center justify-center bg-primary/8">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="1.5" opacity="0.3" aria-hidden="true">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
               <path d="M21 15l-5-5L5 21" />
@@ -64,37 +65,37 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           </div>
         )}
 
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+
         {/* Category badge */}
-        <span
-          className="absolute top-3 left-3 chip-funded capitalize"
-          style={{ fontSize: '10px', padding: '3px 10px' }}
-        >
+        <span className="absolute top-3 left-3 chip-funded capitalize" style={{ fontSize: '10px', padding: '3px 10px' }}>
           {campaign.category}
         </span>
 
         {/* Days left badge */}
         <span
-          className="absolute top-3 right-3 text-[10px] font-semibold text-white bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full"
-          style={{ borderRadius: '9999px' }}
+          className="absolute top-3 right-3 text-[10px] font-bold text-white px-2.5 py-1 rounded-full"
+          style={{ background: daysLeft === 0 ? 'rgba(239,68,68,0.7)' : 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}
         >
           {daysLeft === 0 ? 'Last day!' : `${daysLeft}d left`}
         </span>
       </div>
 
       {/* Card body */}
-      <div className="flex flex-col p-5 flex-grow" style={{ padding: '20px' }}>
+      <div className="flex flex-col p-5 flex-grow">
         <h3
-          className="text-[1.125rem] font-semibold text-foreground mb-1 line-clamp-2"
-          style={{ lineHeight: 1.3 }}
+          className="text-base font-bold text-white mb-1 line-clamp-2"
+          style={{ lineHeight: 1.35 }}
         >
           {campaign.title}
         </h3>
-        <p className="text-xs text-[var(--text-secondary)] mb-4">by {campaign.creator_name}</p>
+        <p className="text-xs text-white/40 mb-5">by {campaign.creator_name}</p>
 
         {/* Progress bar */}
         <div
-          className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full mb-2 overflow-hidden"
-          style={{ height: '8px', borderRadius: '9999px' }}
+          className="w-full bg-white/8 rounded-full mb-3 overflow-hidden"
+          style={{ height: '6px' }}
           role="progressbar"
           aria-valuenow={percent}
           aria-valuemin={0}
@@ -102,25 +103,25 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           aria-label={`${percent}% funded`}
         >
           <div
-            className="h-full rounded-full"
-            style={{
-              width: `${percent}%`,
-              backgroundColor: progressColor,
-              transition: 'width 0.6s ease',
-              borderRadius: '9999px',
-            }}
+            className={`h-full rounded-full bg-gradient-to-r ${progressGradient}`}
+            style={{ width: `${percent}%`, transition: 'width 0.8s ease' }}
           />
         </div>
 
         {/* Footer stats */}
-        <div className="flex items-center justify-between mt-auto pt-2">
+        <div className="flex items-center justify-between mt-auto">
           <div>
-            <span className="text-lg font-bold text-[var(--primary)] tabular-nums">
+            <span className="text-lg font-black text-white tabular-nums">
               {campaign.amount_raised.toLocaleString()}
             </span>
-            <span className="text-xs text-[var(--text-secondary)] ml-1">credits raised</span>
+            <span className="text-xs text-white/40 ml-1.5">credits raised</span>
           </div>
-          <span className="text-xs font-semibold text-[var(--text-secondary)]">{percent}%</span>
+          <span
+            className="text-xs font-bold px-2 py-0.5 rounded-full"
+            style={{ background: 'rgba(99,102,241,0.15)', color: '#818CF8' }}
+          >
+            {percent}%
+          </span>
         </div>
       </div>
     </Link>
