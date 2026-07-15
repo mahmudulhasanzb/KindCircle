@@ -40,7 +40,8 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           <Image
             src={campaign.image_url}
             alt={campaign.title}
-            fill
+            height={180}
+            width={400}
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
