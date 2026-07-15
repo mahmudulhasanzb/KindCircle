@@ -100,6 +100,16 @@ export default function Navbar() {
             >
               Explore Campaigns
             </Link>
+            {user && (
+              <Link
+                href="/leaderboard"
+                className={`text-[14px] font-medium transition-colors hover:text-primary ${
+                  isActive('/leaderboard') ? 'text-primary' : 'text-neutral-400'
+                }`}
+              >
+                Leaderboard
+              </Link>
+            )}
           </div>
         </div>
 
@@ -281,13 +291,22 @@ export default function Navbar() {
               Explore Campaigns
             </Link>
             {user && (
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block rounded-lg px-3 py-2 text-base font-medium text-neutral-400 hover:bg-neutral-800 hover:text-white"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/leaderboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block rounded-lg px-3 py-2 text-base font-medium text-neutral-400 hover:bg-neutral-800 hover:text-white"
+                >
+                  Leaderboard
+                </Link>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block rounded-lg px-3 py-2 text-base font-medium text-neutral-400 hover:bg-neutral-800 hover:text-white"
+                >
+                  Dashboard
+                </Link>
+              </>
             )}
           </div>
 
