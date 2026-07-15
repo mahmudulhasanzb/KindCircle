@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { User, Trash2 } from 'lucide-react';
 import { deleteUserAction, updateUserRoleAction } from '@/lib/api/admin/actions';
+import DeleteModal from '@/components/ui/DeleteModal';
 
 interface UserData {
   _id: string;
@@ -47,10 +48,17 @@ export default function UserManagementTable({ users: initialUsers }: UserManagem
     }
   }
 
-  async function handleDelete(id: string, email: string) {
-    if (!confirm(`Are you sure you want to remove user: ${email}? This action is irreversible.`)) {
-      return;
-    }
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{ id: string; email: string } | null>(null);
+
+  function openDeleteModal(id: string, email: string) {
+    setUserToDelete({ id, email });
+    setIsDeleteModalOpen(true);
+  }
+
+  async function handleDeleteConfirm() {
+    if (!userToDelete) return;
+    const { id } = userToDelete;
 
     setIsProcessing(id);
     const toastId = toast.loading('Removing user...');
@@ -63,6 +71,7 @@ export default function UserManagementTable({ users: initialUsers }: UserManagem
       } else {
         toast.success('User removed successfully.', { id: toastId });
         setUsers((prev) => prev.filter((u) => u._id !== id));
+        setIsDeleteModalOpen(false);
         router.refresh();
       }
     } catch (err: any) {
@@ -71,6 +80,7 @@ export default function UserManagementTable({ users: initialUsers }: UserManagem
       setIsProcessing(null);
     }
   }
+
 
   if (users.length === 0) {
     return (
@@ -129,7 +139,7 @@ export default function UserManagementTable({ users: initialUsers }: UserManagem
               </td>
               <td className="px-5 py-4 text-right">
                 <button
-                  onClick={() => handleDelete(u._id, u.email)}
+                  onClick={() => openDeleteModal(u._id, u.email)}
                   disabled={isProcessing !== null}
                   className="p-2 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition disabled:opacity-50 cursor-pointer"
                   title="Remove User"
@@ -141,6 +151,21 @@ export default function UserManagementTable({ users: initialUsers }: UserManagem
           ))}
         </tbody>
       </table>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Remove User?"
+        message={
+          <>
+            Are you sure you want to remove user <strong>{userToDelete?.email}</strong>? This action is permanent and cannot be undone.
+          </>
+        }
+        confirmText="Remove User"
+        isProcessing={isProcessing !== null}
+      />
     </div>
   );
 }

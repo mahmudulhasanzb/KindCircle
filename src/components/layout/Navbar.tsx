@@ -171,10 +171,10 @@ export default function Navbar() {
                           </div>
                           <div className="p-1 space-y-0.5">
                             <Link
-                              href="/profile"
+                              href="/dashboard"
                               className="flex items-center px-3 py-2 rounded-lg text-sm text-neutral-400 hover:text-white hover:bg-neutral-800/40 transition-colors duration-150"
                             >
-                              Profile
+                              Dashboard
                             </Link>
                             <button
                               onClick={handleLogout}

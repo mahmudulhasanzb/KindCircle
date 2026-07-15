@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { Edit2, Trash2, X, Calendar, DollarSign, FolderHeart } from 'lucide-react';
 import type { Campaign } from '@/lib/types/campaign';
 import { updateCampaignAction, deleteCampaignAction } from '@/lib/api/campaigns/actions';
+import DeleteModal from '@/components/ui/DeleteModal';
 
 interface MyCampaignsTableProps {
   initialCampaigns: Campaign[];
@@ -293,52 +294,20 @@ export default function MyCampaignsTable({ initialCampaigns }: MyCampaignsTableP
         </div>
       )}
 
-      {/* ── DELETE CONFIRMATION DIALOG MODAL ── */}
-      {isDeleteModalOpen && campaignToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDeleteModalOpen(false)} />
-          
-          <div
-            className="relative bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-[440px] p-6 shadow-2xl animate-in fade-in scale-in-95 duration-200 z-50"
-            style={{ borderRadius: '16px', padding: '24px' }}
-          >
-            <div className="flex items-center gap-3 text-red-500 mb-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01" />
-              </svg>
-              <h3 className="text-lg font-bold text-white leading-tight">Delete Campaign?</h3>
-            </div>
-
-            <p className="text-sm text-neutral-300 mb-5 leading-relaxed">
-              Are you sure you want to delete <strong>"{campaignToDelete.title}"</strong>? This action is permanent.
-              All approved contributions will be refunded immediately, and the campaign will be deleted.
-            </p>
-
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setIsDeleteModalOpen(false)}
-                disabled={isDeleting}
-                className="px-4 py-2 border border-neutral-800 text-neutral-300 text-xs font-semibold rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
-                style={{ borderRadius: '8px' }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteConfirm}
-                disabled={isDeleting}
-                className={`px-5 py-2 bg-[var(--danger)] text-white text-xs font-semibold rounded-lg hover:bg-[#DC2626] transition-colors flex items-center gap-2 cursor-pointer ${
-                  isDeleting ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                style={{ borderRadius: '8px' }}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete and Refund'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Reusable Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Campaign?"
+        message={
+          <>
+            Are you sure you want to delete <strong>"{campaignToDelete?.title}"</strong>? This action is permanent. All approved contributions will be refunded immediately, and the campaign will be deleted.
+          </>
+        }
+        confirmText="Delete and Refund"
+        isProcessing={isDeleting}
+      />
     </div>
   );
 }

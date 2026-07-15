@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Trash2, Eye } from 'lucide-react';
 import { deleteCampaignAction } from '@/lib/api/admin/actions';
+import DeleteModal from '@/components/ui/DeleteModal';
 
 interface Campaign {
   _id: string;
@@ -28,10 +29,17 @@ export default function CampaignManagementTable({ campaigns: initialCampaigns }:
   const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
-  async function handleDelete(id: string, title: string) {
-    if (!confirm(`Are you sure you want to delete campaign: "${title}"? This will permanently remove it from the system.`)) {
-      return;
-    }
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState<{ id: string; title: string } | null>(null);
+
+  function openDeleteModal(id: string, title: string) {
+    setCampaignToDelete({ id, title });
+    setIsDeleteModalOpen(true);
+  }
+
+  async function handleDeleteConfirm() {
+    if (!campaignToDelete) return;
+    const { id } = campaignToDelete;
 
     setIsProcessing(id);
     const toastId = toast.loading('Deleting campaign...');
@@ -44,6 +52,7 @@ export default function CampaignManagementTable({ campaigns: initialCampaigns }:
       } else {
         toast.success('Campaign deleted successfully.', { id: toastId });
         setCampaigns((prev) => prev.filter((c) => c._id !== id));
+        setIsDeleteModalOpen(false);
         router.refresh();
       }
     } catch (err: any) {
@@ -52,6 +61,7 @@ export default function CampaignManagementTable({ campaigns: initialCampaigns }:
       setIsProcessing(null);
     }
   }
+
 
   if (campaigns.length === 0) {
     return (
@@ -130,7 +140,7 @@ export default function CampaignManagementTable({ campaigns: initialCampaigns }:
               </td>
               <td className="px-5 py-4 text-right">
                 <button
-                  onClick={() => handleDelete(c._id, c.title)}
+                  onClick={() => openDeleteModal(c._id, c.title)}
                   disabled={isProcessing !== null}
                   className="p-2 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition disabled:opacity-50 cursor-pointer"
                   title="Delete Campaign"
@@ -142,6 +152,21 @@ export default function CampaignManagementTable({ campaigns: initialCampaigns }:
           ))}
         </tbody>
       </table>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Campaign?"
+        message={
+          <>
+            Are you sure you want to permanently delete campaign <strong>"{campaignToDelete?.title}"</strong>? This will remove the campaign from the system and refund any contributions.
+          </>
+        }
+        confirmText="Delete Campaign"
+        isProcessing={isProcessing !== null}
+      />
     </div>
   );
 }

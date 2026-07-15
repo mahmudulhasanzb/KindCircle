@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { Check, X, ShieldAlert } from 'lucide-react';
 import { dismissReportAction } from '@/lib/api/reports/actions';
 import { rejectCampaignAction, deleteCampaignAction } from '@/lib/api/admin/actions';
+import DeleteModal from '@/components/ui/DeleteModal';
 
 interface Report {
   _id: string;
@@ -26,15 +27,43 @@ export default function ReportManagementTable({ reports: initialReports }: Repor
   const [reports, setReports] = useState<Report[]>(initialReports);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
-  async function handleSuspend(reportId: string, campaignId: string) {
-    if (!confirm('Are you sure you want to suspend this campaign? This will mark it as rejected.')) {
-      return;
-    }
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: 'suspend' | 'delete' | null;
+    reportId: string;
+    campaignId: string;
+    campaignTitle: string;
+  }>({
+    isOpen: false,
+    type: null,
+    reportId: '',
+    campaignId: '',
+    campaignTitle: '',
+  });
+
+  function openConfirmModal(type: 'suspend' | 'delete', reportId: string, campaignId: string, campaignTitle: string) {
+    setModalState({
+      isOpen: true,
+      type,
+      reportId,
+      campaignId,
+      campaignTitle,
+    });
+  }
+
+  async function handleModalConfirm() {
+    const { type, reportId, campaignId } = modalState;
+    if (!type) return;
 
     setIsProcessing(reportId);
-    const toastId = toast.loading('Suspending campaign...');
+    const actionLabel = type === 'suspend' ? 'Suspending' : 'Deleting';
+    const toastId = toast.loading(`${actionLabel} campaign...`);
+
     try {
-      const res = await rejectCampaignAction(campaignId);
+      const res = type === 'suspend' 
+        ? await rejectCampaignAction(campaignId)
+        : await deleteCampaignAction(campaignId);
+
       if (res && res.error) {
         toast.error(res.error, { id: toastId });
       } else if (res && res.message && res.message.includes('failed')) {
@@ -42,43 +71,18 @@ export default function ReportManagementTable({ reports: initialReports }: Repor
       } else {
         // Also dismiss the report automatically
         await dismissReportAction(reportId);
-        toast.success('Campaign suspended and report resolved!', { id: toastId });
+        toast.success(`Campaign ${type === 'suspend' ? 'suspended' : 'deleted'} and report resolved!`, { id: toastId });
         setReports((prev) => prev.filter((r) => r._id !== reportId));
+        setModalState((prev) => ({ ...prev, isOpen: false }));
         router.refresh();
       }
     } catch (err: any) {
-      toast.error(err.message || 'Failed to suspend campaign', { id: toastId });
+      toast.error(err.message || `Failed to ${type} campaign`, { id: toastId });
     } finally {
       setIsProcessing(null);
     }
   }
 
-  async function handleDelete(reportId: string, campaignId: string) {
-    if (!confirm('Are you sure you want to permanently delete this campaign? This cannot be undone.')) {
-      return;
-    }
-
-    setIsProcessing(reportId);
-    const toastId = toast.loading('Deleting campaign...');
-    try {
-      const res = await deleteCampaignAction(campaignId);
-      if (res && res.error) {
-        toast.error(res.error, { id: toastId });
-      } else if (res && res.message && res.message.includes('failed')) {
-        toast.error(res.message, { id: toastId });
-      } else {
-        // Also dismiss the report automatically
-        await dismissReportAction(reportId);
-        toast.success('Campaign deleted and report resolved!', { id: toastId });
-        setReports((prev) => prev.filter((r) => r._id !== reportId));
-        router.refresh();
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to delete campaign', { id: toastId });
-    } finally {
-      setIsProcessing(null);
-    }
-  }
 
   async function handleDismiss(reportId: string) {
     setIsProcessing(reportId);
@@ -144,14 +148,14 @@ export default function ReportManagementTable({ reports: initialReports }: Repor
               <td className="px-5 py-4 text-right">
                 <div className="flex justify-end gap-2">
                   <button
-                    onClick={() => handleSuspend(r._id, r.campaignId)}
+                    onClick={() => openConfirmModal('suspend', r._id, r.campaignId, r.campaignTitle)}
                     disabled={isProcessing !== null || r.campaignTitle === 'Deleted Campaign'}
                     className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-xs font-bold text-amber-400 ring-1 ring-amber-500/30 hover:bg-amber-500/20 transition disabled:opacity-50 cursor-pointer"
                   >
                     <span>Suspend</span>
                   </button>
                   <button
-                    onClick={() => handleDelete(r._id, r.campaignId)}
+                    onClick={() => openConfirmModal('delete', r._id, r.campaignId, r.campaignTitle)}
                     disabled={isProcessing !== null || r.campaignTitle === 'Deleted Campaign'}
                     className="inline-flex items-center gap-1 rounded-lg bg-rose-500/10 px-2.5 py-1.5 text-xs font-bold text-rose-400 ring-1 ring-rose-500/30 hover:bg-rose-500/20 transition disabled:opacity-50 cursor-pointer"
                   >
@@ -171,6 +175,27 @@ export default function ReportManagementTable({ reports: initialReports }: Repor
           ))}
         </tbody>
       </table>
+
+      {/* Reusable Delete/Suspend Modal */}
+      <DeleteModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={handleModalConfirm}
+        title={modalState.type === 'suspend' ? 'Suspend Campaign?' : 'Delete Campaign?'}
+        message={
+          modalState.type === 'suspend' ? (
+            <>
+              Are you sure you want to suspend campaign <strong>"{modalState.campaignTitle}"</strong>? It will be rejected and removed from public listings.
+            </>
+          ) : (
+            <>
+              Are you sure you want to permanently delete campaign <strong>"{modalState.campaignTitle}"</strong>? This action is irreversible and will refund contributors.
+            </>
+          )
+        }
+        confirmText={modalState.type === 'suspend' ? 'Suspend Campaign' : 'Delete Campaign'}
+        isProcessing={isProcessing !== null}
+      />
     </div>
   );
 }
