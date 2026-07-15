@@ -8,10 +8,9 @@ const db = client.db('KindCircle');
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, { client }),
-  trustedOrigins: [
-    'https://client-phi-eight-17.vercel.app',
-    'https://client-ivory-one-96.vercel.app'
-  ],
+  trustedOrigins: process.env.TRUSTED_ORIGINS
+    ? process.env.TRUSTED_ORIGINS.split(',').map((o) => o.trim())
+    : [],
   emailAndPassword: {
     enabled: true,
   },
