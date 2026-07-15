@@ -16,6 +16,7 @@ import {
 import { GithubIcon } from '@/components/ui/Icons';
 import { authClient } from '@/lib/auth-client';
 
+
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -78,7 +79,7 @@ export default function Navbar() {
         {/* Left Section: Logo */}
         <div className="flex items-center gap-8">
           <Link
-            href={user ? '/dashboard' : '/'}
+            href={'/'}
             className="flex items-center gap-2 group"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary font-bold text-lg text-white shadow-md shadow-primary/20 transition-transform group-hover:scale-105">
